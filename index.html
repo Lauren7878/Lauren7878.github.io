@@ -419,6 +419,7 @@
         
         // 完成抛硬币
         function completeTossing() {
+            console.log('完成抛硬币，开始处理结果');
             document.getElementById('tossButton').disabled = false;
             document.getElementById('tossButton').textContent = "重新起卦";
             
@@ -427,8 +428,9 @@
             
             // 延迟生成AI指令，确保卦象和时间已经更新
             setTimeout(() => {
+                console.log('准备生成AI指令');
                 generateAIPrompt();
-            }, 100);
+            }, 500);
         }
         
         // 生成卦象
@@ -461,6 +463,11 @@
             
             // 显示起卦时间（真太阳时）
             displayTime();
+            
+            // 生成AI指令
+            setTimeout(() => {
+                generateAIPrompt();
+            }, 100);
         }
         
         // 显示卦象
@@ -511,9 +518,13 @@
         
         // 生成AI解卦指令
         function generateAIPrompt() {
+            console.log('开始生成AI指令');
             const aiPrompt = document.getElementById('aiPrompt');
             const hexagramName = document.getElementById('hexagramName').textContent;
             const hexagramTime = document.getElementById('hexagramTime').textContent;
+            
+            console.log('卦象名称:', hexagramName);
+            console.log('起卦时间:', hexagramTime);
             
             const prompt = `请帮我解这个六爻卦象：
 
@@ -529,8 +540,9 @@
 
 请结合卦象的传统解释和现实情况，给出详细而实用的解读。`;
             
+            console.log('生成的指令:', prompt);
             aiPrompt.value = prompt;
-            console.log('生成的AI指令:', prompt);
+            console.log('AI指令已更新');
         }
         
         // 复制AI指令
