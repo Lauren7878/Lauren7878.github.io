@@ -514,6 +514,9 @@
                 second: '2-digit'
             });
             hexagramTime.textContent = `起卦时间：${timeString}（真太阳时）`;
+            
+            // 生成AI指令
+            generateAIPrompt();
         }
         
         // 生成AI解卦指令
