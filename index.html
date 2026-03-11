@@ -431,13 +431,20 @@
         
         // 生成卦象
         function generateHexagram() {
-            // 转换结果为卦象线条（2阳，1阴）
-            const hexagramLines = tossResults.map(result => result === 2 ? 1 : 0);
+            // 转换结果为卦象线条（2阳，1阴），并反转顺序以符合六爻从下往上的排列
+            const hexagramLines = tossResults.map(result => result === 2 ? 1 : 0).reverse();
             
             // 查找对应的卦象
             let hexagram = null;
             for (const h of hexagrams) {
-                if (JSON.stringify(h.lines) === JSON.stringify(hexagramLines)) {
+                let match = true;
+                for (let i = 0; i < 6; i++) {
+                    if (h.lines[i] !== hexagramLines[i]) {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match) {
                     hexagram = h;
                     break;
                 }
@@ -480,6 +487,9 @@
             
             // 显示卦名
             hexagramName.textContent = hexagram.name;
+            // 调试信息
+            console.log('生成的卦象线条:', hexagramLines);
+            console.log('匹配的卦象:', hexagram);
         }
         
         // 显示起卦时间
