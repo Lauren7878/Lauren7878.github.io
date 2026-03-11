@@ -425,8 +425,10 @@
             // 生成卦象
             generateHexagram();
             
-            // 生成AI指令
-            generateAIPrompt();
+            // 延迟生成AI指令，确保卦象和时间已经更新
+            setTimeout(() => {
+                generateAIPrompt();
+            }, 100);
         }
         
         // 生成卦象
@@ -528,6 +530,7 @@
 请结合卦象的传统解释和现实情况，给出详细而实用的解读。`;
             
             aiPrompt.value = prompt;
+            console.log('生成的AI指令:', prompt);
         }
         
         // 复制AI指令
