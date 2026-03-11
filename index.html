@@ -489,30 +489,39 @@
         
         // 显示卦象
         function displayHexagram(hexagram) {
+            console.log('开始显示卦象');
             const hexagramImage = document.getElementById('hexagramImage');
             const hexagramName = document.getElementById('hexagramName');
             
-            // 清空卦象
-            hexagramImage.innerHTML = '';
+            console.log('卦象元素:', { hexagramImage, hexagramName });
             
-            // 绘制卦象线条
-            hexagram.lines.forEach((line, index) => {
-                const lineElement = document.createElement('div');
-                lineElement.className = `line ${line === 1 ? 'yang' : 'yin'}`;
+            if (hexagramImage && hexagramName) {
+                // 清空卦象
+                hexagramImage.innerHTML = '';
                 
-                if (line === 1) {
-                    // 阳线
-                    lineElement.innerHTML = '<div class="full-line"></div>';
-                } else {
-                    // 阴线
-                    lineElement.innerHTML = '<div class="segment"></div><div class="gap"></div><div class="segment"></div>';
-                }
+                // 绘制卦象线条
+                hexagram.lines.forEach((line, index) => {
+                    const lineElement = document.createElement('div');
+                    lineElement.className = `line ${line === 1 ? 'yang' : 'yin'}`;
+                    
+                    if (line === 1) {
+                        // 阳线
+                        lineElement.innerHTML = '<div class="full-line"></div>';
+                    } else {
+                        // 阴线
+                        lineElement.innerHTML = '<div class="segment"></div><div class="gap"></div><div class="segment"></div>';
+                    }
+                    
+                    hexagramImage.appendChild(lineElement);
+                });
                 
-                hexagramImage.appendChild(lineElement);
-            });
+                // 显示卦名
+                hexagramName.textContent = hexagram.name;
+                console.log('卦名已更新:', hexagram.name);
+            } else {
+                console.error('无法找到卦象元素');
+            }
             
-            // 显示卦名
-            hexagramName.textContent = hexagram.name;
             // 调试信息
             console.log('生成的卦象线条:', hexagramLines);
             console.log('匹配的卦象:', hexagram);
@@ -520,17 +529,26 @@
         
         // 显示起卦时间
         function displayTime() {
+            console.log('开始显示起卦时间');
             const hexagramTime = document.getElementById('hexagramTime');
-            const now = new Date();
-            const timeString = now.toLocaleString('zh-CN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            hexagramTime.textContent = `起卦时间：${timeString}（真太阳时）`;
+            
+            console.log('时间元素:', hexagramTime);
+            
+            if (hexagramTime) {
+                const now = new Date();
+                const timeString = now.toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                hexagramTime.textContent = `起卦时间：${timeString}（真太阳时）`;
+                console.log('起卦时间已更新:', timeString);
+            } else {
+                console.error('无法找到时间元素');
+            }
             
             // 生成AI指令
             generateAIPrompt();
@@ -547,31 +565,27 @@
             const hexagramTimeElement = document.getElementById('hexagramTime');
             
             console.log('元素获取结果:', {
-                aiPromptElement: aiPromptElement,
-                hexagramNameElement: hexagramNameElement,
-                hexagramTimeElement: hexagramTimeElement
+                aiPromptElement: !!aiPromptElement,
+                hexagramNameElement: !!hexagramNameElement,
+                hexagramTimeElement: !!hexagramTimeElement
             });
             
-            if (aiPromptElement && hexagramNameElement && hexagramTimeElement) {
-                const hexagramName = hexagramNameElement.textContent;
-                const hexagramTime = hexagramTimeElement.textContent;
+            if (aiPromptElement) {
+                let hexagramName = '未知卦';
+                let hexagramTime = '未知时间';
+                
+                if (hexagramNameElement) {
+                    hexagramName = hexagramNameElement.textContent;
+                }
+                
+                if (hexagramTimeElement) {
+                    hexagramTime = hexagramTimeElement.textContent;
+                }
                 
                 console.log('卦象名称:', hexagramName);
                 console.log('起卦时间:', hexagramTime);
                 
-                const prompt = `请帮我解这个六爻卦象：
-
-卦象：${hexagramName}
-起卦时间：${hexagramTime}
-
-请从以下几个方面进行详细解析：
-1. 卦象的基本含义
-2. 针对当前时间的应期分析
-3. 可能的吉凶祸福
-4. 建议的应对策略
-5. 不同方面（事业、感情、财运等）的具体分析
-
-请结合卦象的传统解释和现实情况，给出详细而实用的解读。`;
+                const prompt = `请帮我解这个六爻卦象：\n\n卦象：${hexagramName}\n起卦时间：${hexagramTime}\n\n请从以下几个方面进行详细解析：\n1. 卦象的基本含义\n2. 针对当前时间的应期分析\n3. 可能的吉凶祸福\n4. 建议的应对策略\n5. 不同方面（事业、感情、财运等）的具体分析\n\n请结合卦象的传统解释和现实情况，给出详细而实用的解读。`;
                 
                 console.log('生成的指令:', prompt);
                 
@@ -579,12 +593,11 @@
                 try {
                     aiPromptElement.value = prompt;
                     console.log('AI指令已更新:', aiPromptElement.value);
-                    console.log('输入框当前值:', document.getElementById('aiPrompt').value);
                 } catch (error) {
                     console.error('设置AI指令时出错:', error);
                 }
             } else {
-                console.error('无法找到必要的元素');
+                console.error('无法找到AI指令输入框');
             }
             console.log('====================================');
         }
