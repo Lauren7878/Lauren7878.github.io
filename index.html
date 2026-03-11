@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六爻起卦和解卦</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        
+        .section h2 {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        #coinTossSection {
+            text-align: center;
+        }
+        
+        #tossButton {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        #tossButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        #tossButton:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        #tossResults {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .tossResult {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .tossResult.head {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .tossResult.tail {
+            background: #f44336;
+            color: white;
+        }
+        
+        .tossResult.pending {
+            background: #e0e0e0;
+            color: #999;
+        }
+        
+        #hexagramSection {
+            text-align: center;
+        }
+        
+        #hexagramImage {
+            width: 220px;
+            min-height: 220px;
+            margin: 20px auto;
+            position: relative;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background: white;
+            padding: 10px;
+        }
+        
+        .line {
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px 10px;
+        }
+        
+        .line .segment {
+            width: 10px;
+            height: 2px;
+            background: #333;
+            margin: 0 5px;
+        }
+        
+        .line .gap {
+            width: 20px;
+            height: 2px;
+            background: transparent;
+            margin: 0 5px;
+        }
+        
+        .line .full-line {
+            width: 50px;
+            height: 2px;
+            background: #333;
+        }
+        
+        .line.yang {
+            background: #e3f2fd;
+            border-radius: 5px;
+        }
+        
+        .line.yin {
+            background: #fff3e0;
+            border-radius: 5px;
+        }
+        
+        #hexagramName {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        
+        #hexagramTime {
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        #aiPromptSection {
+            position: relative;
+        }
+        
+        #aiPrompt {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        #copyButton {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        #copyButton:hover {
+            background: #0b7dda;
+        }
+        
+        #copyMessage {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        #copyMessage.show {
+            opacity: 1;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            #tossResults {
+                justify-content: center;
+            }
+            
+            .tossResult {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+            
+            #hexagramImage {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>六爻起卦和解卦</h1>
+        
+        <!-- 起卦部分 -->
+        <div class="section" id="coinTossSection">
+            <h2>1. 起卦</h2>
+            <p>点击按钮开始抛硬币，共抛6次</p>
+            <br>
+            <button id="tossButton">开始起卦</button>
+            <div id="tossResults">
+                <div class="tossResult pending">1</div>
+                <div class="tossResult pending">2</div>
+                <div class="tossResult pending">3</div>
+                <div class="tossResult pending">4</div>
+                <div class="tossResult pending">5</div>
+                <div class="tossResult pending">6</div>
+            </div>
+        </div>
+        
+        <!-- 卦象部分 -->
+        <div class="section" id="hexagramSection">
+            <h2>2. 卦象结果</h2>
+            <div id="hexagramImage"></div>
+            <div id="hexagramName">等待起卦</div>
+            <div id="hexagramTime"></div>
+        </div>
+        
+        <!-- AI解卦指令 -->
+        <div class="section" id="aiPromptSection">
+            <h2>3. AI解卦指令</h2>
+            <textarea id="aiPrompt" readonly>等待起卦完成...</textarea>
+            <button id="copyButton">复制指令</button>
+        </div>
+    </div>
+    
+    <div id="copyMessage">指令已复制到剪贴板</div>
+    
+    <script>
+        // 六爻卦象数据
+        const hexagrams = [
+            { name: "乾卦", lines: [1, 1, 1, 1, 1, 1] },
+            { name: "坤卦", lines: [0, 0, 0, 0, 0, 0] },
+            { name: "屯卦", lines: [0, 0, 1, 0, 0, 0] },
+            { name: "蒙卦", lines: [0, 0, 0, 1, 0, 0] },
+            { name: "需卦", lines: [1, 0, 0, 1, 1, 1] },
+            { name: "讼卦", lines: [1, 1, 1, 1, 0, 0] },
+            { name: "师卦", lines: [0, 0, 0, 0, 1, 0] },
+            { name: "比卦", lines: [0, 1, 0, 0, 0, 0] },
+            { name: "小畜卦", lines: [1, 1, 0, 1, 1, 1] },
+            { name: "履卦", lines: [1, 1, 1, 0, 1, 1] },
+            { name: "泰卦", lines: [0, 0, 0, 1, 1, 1] },
+            { name: "否卦", lines: [1, 1, 1, 0, 0, 0] },
+            { name: "同人卦", lines: [1, 1, 0, 0, 1, 1] },
+            { name: "大有卦", lines: [1, 0, 0, 1, 1, 1] },
+            { name: "谦卦", lines: [0, 1, 0, 0, 0, 1] },
+            { name: "豫卦", lines: [1, 0, 0, 0, 1, 0] },
+            { name: "随卦", lines: [0, 1, 1, 0, 1, 0] },
+            { name: "蛊卦", lines: [0, 1, 0, 1, 1, 0] },
+            { name: "临卦", lines: [0, 0, 0, 0, 1, 1] },
+            { name: "观卦", lines: [1, 1, 0, 0, 0, 0] },
+            { name: "噬嗑卦", lines: [0, 1, 0, 1, 0, 1] },
+            { name: "贲卦", lines: [1, 0, 1, 0, 1, 0] },
+            { name: "剥卦", lines: [0, 0, 0, 0, 0, 1] },
+            { name: "复卦", lines: [1, 0, 0, 0, 0, 0] },
+            { name: "无妄卦", lines: [1, 0, 0, 0, 1, 1] },
+            { name: "大畜卦", lines: [1, 1, 1, 0, 0, 1] },
+            { name: "颐卦", lines: [1, 0, 0, 0, 0, 1] },
+            { name: "大过卦", lines: [0, 1, 1, 1, 1, 0] },
+            { name: "坎卦", lines: [0, 1, 0, 0, 1, 0] },
+            { name: "离卦", lines: [1, 0, 1, 1, 0, 1] },
+            { name: "咸卦", lines: [0, 1, 1, 1, 0, 0] },
+            { name: "恒卦", lines: [0, 0, 1, 1, 1, 0] },
+            { name: "遁卦", lines: [1, 1, 1, 1, 0, 1] },
+            { name: "大壮卦", lines: [1, 0, 1, 1, 1, 1] },
+            { name: "晋卦", lines: [0, 0, 0, 1, 0, 1] },
+            { name: "明夷卦", lines: [1, 0, 1, 0, 0, 0] },
+            { name: "家人卦", lines: [0, 1, 1, 0, 0, 1] },
+            { name: "睽卦", lines: [1, 0, 0, 1, 1, 0] },
+            { name: "蹇卦", lines: [0, 0, 1, 0, 1, 0] },
+            { name: "解卦", lines: [0, 1, 0, 1, 0, 0] },
+            { name: "损卦", lines: [0, 1, 0, 0, 1, 1] },
+            { name: "益卦", lines: [1, 1, 0, 0, 1, 0] },
+            { name: "夬卦", lines: [1, 1, 1, 1, 1, 0] },
+            { name: "姤卦", lines: [0, 1, 1, 1, 1, 1] },
+            { name: "萃卦", lines: [0, 0, 1, 0, 0, 1] },
+            { name: "升卦", lines: [1, 0, 0, 1, 0, 0] },
+            { name: "困卦", lines: [0, 1, 1, 0, 1, 0] },
+            { name: "井卦", lines: [0, 1, 0, 1, 1, 0] },
+            { name: "革卦", lines: [1, 0, 1, 0, 1, 1] },
+            { name: "鼎卦", lines: [1, 1, 1, 0, 1, 0] },
+            { name: "震卦", lines: [0, 0, 1, 0, 0, 1] },
+            { name: "艮卦", lines: [1, 0, 0, 1, 0, 0] },
+            { name: "渐卦", lines: [0, 1, 1, 0, 0, 0] },
+            { name: "归妹卦", lines: [0, 0, 0, 1, 1, 0] },
+            { name: "丰卦", lines: [1, 0, 1, 0, 0, 1] },
+            { name: "旅卦", lines: [1, 0, 0, 1, 0, 1] },
+            { name: "巽卦", lines: [1, 0, 1, 1, 0, 0] },
+            { name: "兑卦", lines: [0, 0, 1, 1, 0, 1] },
+            { name: "涣卦", lines: [0, 1, 0, 1, 1, 1] },
+            { name: "节卦", lines: [1, 1, 1, 0, 1, 0] },
+            { name: "中孚卦", lines: [0, 1, 1, 1, 1, 0] },
+            { name: "小过卦", lines: [0, 0, 1, 1, 1, 1] },
+            { name: "既济卦", lines: [1, 0, 1, 0, 1, 0] },
+            { name: "未济卦", lines: [0, 1, 0, 1, 0, 1] }
+        ];
+        
+        let tossResults = [];
+        let currentToss = 0;
+        
+        // 初始化页面
+        function init() {
+            document.getElementById('tossButton').addEventListener('click', startTossing);
+            document.getElementById('copyButton').addEventListener('click', copyPrompt);
+        }
+        
+        // 开始抛硬币
+        function startTossing() {
+            tossResults = [];
+            currentToss = 0;
+            document.getElementById('tossButton').disabled = true;
+            document.getElementById('tossButton').textContent = "起卦中...";
+            
+            // 重置结果显示
+            const resultElements = document.querySelectorAll('.tossResult');
+            resultElements.forEach((el, index) => {
+                el.className = 'tossResult pending';
+                el.textContent = index + 1;
+            });
+            
+            // 开始抛硬币
+            tossCoin();
+        }
+        
+        // 抛硬币
+        function tossCoin() {
+            if (currentToss >= 6) {
+                completeTossing();
+                return;
+            }
+            
+            // 模拟抛硬币动画
+            const resultElement = document.querySelectorAll('.tossResult')[currentToss];
+            resultElement.textContent = '...';
+            
+            setTimeout(() => {
+                // 模拟两枚硬币的结果（1为阳，0为阴）
+                const coin1 = Math.random() > 0.5 ? 1 : 0;
+                const coin2 = Math.random() > 0.5 ? 1 : 0;
+                const result = coin1 + coin2;
+                
+                tossResults.push(result);
+                
+                // 更新显示
+                resultElement.className = `tossResult ${result === 2 ? 'head' : 'tail'}`;
+                resultElement.textContent = result === 2 ? '阳' : '阴';
+                
+                currentToss++;
+                
+                // 继续下一次抛硬币
+                setTimeout(tossCoin, 1000);
+            }, 1000);
+        }
+        
+        // 完成抛硬币
+        function completeTossing() {
+            document.getElementById('tossButton').disabled = false;
+            document.getElementById('tossButton').textContent = "重新起卦";
+            
+            // 生成卦象
+            generateHexagram();
+            
+            // 生成AI指令
+            generateAIPrompt();
+        }
+        
+        // 生成卦象
+        function generateHexagram() {
+            // 转换结果为卦象线条（2阳，1阴）
+            const hexagramLines = tossResults.map(result => result === 2 ? 1 : 0);
+            
+            // 查找对应的卦象
+            let hexagram = null;
+            for (const h of hexagrams) {
+                if (JSON.stringify(h.lines) === JSON.stringify(hexagramLines)) {
+                    hexagram = h;
+                    break;
+                }
+            }
+            
+            if (!hexagram) {
+                hexagram = { name: "未知卦", lines: hexagramLines };
+            }
+            
+            // 显示卦象
+            displayHexagram(hexagram);
+            
+            // 显示起卦时间（真太阳时）
+            displayTime();
+        }
+        
+        // 显示卦象
+        function displayHexagram(hexagram) {
+            const hexagramImage = document.getElementById('hexagramImage');
+            const hexagramName = document.getElementById('hexagramName');
+            
+            // 清空卦象
+            hexagramImage.innerHTML = '';
+            
+            // 绘制卦象线条
+            hexagram.lines.forEach((line, index) => {
+                const lineElement = document.createElement('div');
+                lineElement.className = `line ${line === 1 ? 'yang' : 'yin'}`;
+                
+                if (line === 1) {
+                    // 阳线
+                    lineElement.innerHTML = '<div class="full-line"></div>';
+                } else {
+                    // 阴线
+                    lineElement.innerHTML = '<div class="segment"></div><div class="gap"></div><div class="segment"></div>';
+                }
+                
+                hexagramImage.appendChild(lineElement);
+            });
+            
+            // 显示卦名
+            hexagramName.textContent = hexagram.name;
+        }
+        
+        // 显示起卦时间
+        function displayTime() {
+            const hexagramTime = document.getElementById('hexagramTime');
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            hexagramTime.textContent = `起卦时间：${timeString}（真太阳时）`;
+        }
+        
+        // 生成AI解卦指令
+        function generateAIPrompt() {
+            const aiPrompt = document.getElementById('aiPrompt');
+            const hexagramName = document.getElementById('hexagramName').textContent;
+            const hexagramTime = document.getElementById('hexagramTime').textContent;
+            
+            const prompt = `请帮我解这个六爻卦象：
+
+卦象：${hexagramName}
+起卦时间：${hexagramTime}
+
+请从以下几个方面进行详细解析：
+1. 卦象的基本含义
+2. 针对当前时间的应期分析
+3. 可能的吉凶祸福
+4. 建议的应对策略
+5. 不同方面（事业、感情、财运等）的具体分析
+
+请结合卦象的传统解释和现实情况，给出详细而实用的解读。`;
+            
+            aiPrompt.value = prompt;
+        }
+        
+        // 复制AI指令
+        function copyPrompt() {
+            const aiPrompt = document.getElementById('aiPrompt');
+            aiPrompt.select();
+            document.execCommand('copy');
+            
+            // 显示复制成功提示
+            const copyMessage = document.getElementById('copyMessage');
+            copyMessage.className = 'show';
+            setTimeout(() => {
+                copyMessage.className = '';
+            }, 2000);
+        }
+        
+        // 初始化
+        init();
+    </script>
+</body>
+</html>
