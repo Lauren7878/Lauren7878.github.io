@@ -257,6 +257,13 @@
     <div class="container">
         <h1>六爻起卦和解卦</h1>
         
+        <!-- 关于六爻 -->
+        <div class="section">
+            <h2>关于六爻</h2>
+            <p>源自《周易》，是传统卜筮的核心方法。它的核心是为了帮你解困惑、抓时机、调心态，从而做出当下最有利的选择。</p>
+            <p>如何起卦：在心中默念你的问题，越具体越好。默念问题后点击起卦，随着六次"扔硬币的结果"生成一个卦象。通过卦象和起卦时间，可以得到问题的推断和解答。</p>
+        </div>
+        
         <!-- 起卦部分 -->
         <div class="section" id="coinTossSection">
             <h2>1. 起卦</h2>
@@ -507,7 +514,7 @@
                 minute: '2-digit',
                 second: '2-digit'
             });
-            hexagramTime.textContent = `起卦时间：${timeString}（真太阳时）`;
+            hexagramTime.textContent = `起卦时间：${timeString}`;
         }
         
         // 生成AI解卦指令
@@ -516,19 +523,13 @@
             const hexagramName = document.getElementById('hexagramName').textContent;
             const hexagramTime = document.getElementById('hexagramTime').textContent;
             
-            const prompt = `请帮我解这个六爻卦象：
+            const prompt = `我的具体问题是：请在此处填写您的具体问题
 
-卦象：${hexagramName}
+我的起卦时间和卦象结果：
 起卦时间：${hexagramTime}
+卦象：${hexagramName}
 
-请从以下几个方面进行详细解析：
-1. 卦象的基本含义
-2. 针对当前时间的应期分析
-3. 可能的吉凶祸福
-4. 建议的应对策略
-5. 不同方面（事业、感情、财运等）的具体分析
-
-请结合卦象的传统解释和现实情况，给出详细而实用的解读。`;
+请仅根据我的问题和卦象，具体分析卦象含义，可能的吉凶祸福及建议的应对策略。`;
             
             aiPrompt.value = prompt;
         }
